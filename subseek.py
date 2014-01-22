@@ -1,112 +1,113 @@
-
-'''
-Licence
-subSeek 1.0 - Utility software for Microsoft Windows OS designed to be download movies subtitles  files. Copyright (C) 2012 Robins Kumar Gupta This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, if not, write to the Robins Kumar Gupta Email-robinskumar73@gmail.com For More Info Visit : https://bitbucket.org/robinskumar73/seeksub
-'''
-#SubSeek Script Created by Robins Gupta
-import hashlib
-import os
-import os.path
-import urllib.request as urllib2
-import urllib.parse as urlparse,urllib 
-import gzip
-from io import StringIO
-import re
 import sys
+import subdb
+import opensubtitle 
+import gzip
+import urllib.request as urllib2
+from io import BytesIO
+import re
+import zipfile
+
 
 print('\n\n\n')
 print('*'*20 + 'Subtitle Downloaded By Robins Gupta' + '*'*20)
 print('\n\n\n')
 
 
-#Class for creating connection sockets with various subtitle sites
-class CreateConn():
-    def __init__(self,url,header=None,values=None):
-        #returns a connection socket object
-        if values:
-            #here values must be in dictionary
-            data = urlparse.urlencode(values)
-        else:
-            data=None
-        request = urllib2.Request(url,data)
 
-        if header:
-            request.add_header('User-Agent',header)
+#Writing subtitle to file...
+def write(path,data):
+    with open(path,'wb') as f:
+        f.write(data)
 
-        self.sock_obj = urllib2.urlopen(request) 
-    
-    def read_data(self,buffer=None):
-        #reading data from created socket if data is compressed
-        if self.sock_obj.headers['Content-Encoding'] == 'gzip':
-            if  buffer:
-                data = gzip.GzipFile(fileobj=StringIO(self.sock_obj.read()).read())
-            else :
-                data = gzip.GzipFile(fileobj=StringIO(self.sock_obj.read()).read(buffer))                
-        else:
-            if buffer:
-                data = self.sock_obj.read(buffer)
-            else:
-                data = self.sock_obj.read()
-        
-        #returning the data string
-        return data
 
-class SubDb():
-    #creating a hash function for retrieving hash name
-    def get_md5_hash(self,name):
-        read_size = 64 * 1024
-        with open(name, 'rb') as f:
-            size = os.path.getsize(name)
-            #Reading first 64 kb of file
-            data = f.read(read_size)
-            #Now seeking to 64*1024 from last
-            f.seek(-read_size, os.SEEK_END)
-            #Now reading last 64 kb of file
-            data += f.read(read_size)
-        #Returning the md5 generated hash function of video file
-        return hashlib.md5(data).hexdigest()
-
-    #Now creating a connection with site
-    def conn(self,path):
-        #we are using a default user-agent provided 
-        user_agent = 'SubDB/1.0 (Pyrrot/0.1; http://github.com/jrhames/pyrrot-cli)'
-        #creating connecting using GET method
-        #getting hash of video file
-        hash = self.get_md5_hash(path)
-        #creating url of the file
-        url = 'http://api.thesubdb.com/?action=download&hash=%s&language=en'%(hash)
-        #conn
-        try:
-            conn = CreateConn(url,header=user_agent)
-            if conn.sock_obj.code == 200:
-                print('Subtitle  Found \nLanguage:English\n\nDownloading File...')
-                #File is downloaded
-                #Saving your subtitle
-                with open(sub_file(path),'wb') as f:
-                    f.write(conn.read_data())
-                print ('\nFile Downloaded\nEnjoy!!')
-            elif conn.sock_obj.code == 404:
-                print (r"File Not Found ")
-
-            elif conn.sock_obj.code == 400:
-                print(r"Connection Failed")
-            
-        except urllib.error.HTTPError:
-            print('Sorry!! Subtitle Not Found')
-            
-        
-
-        
-#creating a function for creating the subtitle name
-def file_path(path):
-    return re.sub(r'(\.mp4|\.avi|\.flv|\.mkv)$','',path)
-#creating a function for creating a subtitle file
-def sub_file(path):
-    return file_path(path)+ u'.srt'
 
 #Now loading the file..
 if __name__ == "__main__":
     url_path=sys.argv[1]
-    #Now connecting and finding subtitles
-    SubDb().conn(url_path)
-  
+    #Subtitle file name
+    sub_file_name = subdb.sub_file(url_path)
+    
+    #First try subtitle from opensubtitle....
+    print('Connecting to openSubtitle...')
+    try:
+        conn = opensubtitle.OpenSubtitle(url_path,'robinskumar73','subseek2014')
+        #Search for subtitle in opensubtitle.org
+        results = conn.SearchSubtitles()
+        if results:
+            #Download subtitle
+            #Now checking for data in result...
+            for data in results:
+                try:
+                    download_link = data['SubDownloadLink']
+                    if download_link:
+                        request = urllib2.Request(download_link)
+                        request.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110201')
+                        sock_obj = urllib2.urlopen(request)
+                        f=BytesIO(sock_obj.read())
+                        data = gzip.open(f).read()
+                        
+                        #Now writing subtitle to file...
+                        write(sub_file_name, data)
+                        print ('subtitle downloaded successfully...Enjoy!!')
+                        break
+                       
+                    
+                except KeyError:
+                    print('Downloading a zip file')
+                    try:
+                        download_link = data['ZipDownloadLink']
+                    except:
+                        'If no key exists for zipdownload then continue'
+                        continue
+                    
+                    #Connecting to server...
+                    if download_link:
+                        request = urllib2.Request(download_link)
+                        request.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110201')
+                        sock_obj = urllib2.urlopen(request)
+                        f=BytesIO(sock_obj.read())
+                        if zipfile.is_zipfile(f):
+                            #Creating a zipfile object
+                            z=zipfile.ZipFile(f, mode='r')
+                            sub_file=[]
+                            for file in z.namelist():
+                                matchObj = re.match( r'(.*srt$)', file)
+                                if matchObj:
+                                    #Appending all subtitle files to list
+                                    sub_file.append(file)
+
+                            #Writing zip file
+                            if subfile and len(subfile)==1:
+                                data = z.read(subfile[0])
+                                #Now writing subtitle to file...
+                                sub_data = write(sub_file_name, data)
+                                
+                            else:
+                                print('extracting all zip files')
+                                z.extractall()
+
+                            print('Subtitle downloaded enjoy!!\n')
+                        else:
+                            'Given zip file is not valid continue searching for others subtitles'
+                            continue
+                        #Now breaking the loop
+                        break
+                    
+                    
+            #Now closing session from opensubtitles
+            'Logging out from opensubtitle server'
+            conn.logout()
+                    
+                
+                    
+
+        else:
+            #Now closing session from opensubtitles
+            conn.logout()
+            raise Exception('Subtitle not found in opensubtitle database')
+
+    except:
+        #Try Connecting to SubDb....
+        print('connecting to subdb server')
+        subdb.SubDb().conn(url_path)
+    

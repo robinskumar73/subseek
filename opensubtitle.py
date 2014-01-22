@@ -1,17 +1,12 @@
-import urllib.request as urllib2
-import urllib.parse as urlparse 
-import os.path,gzip
-from io import StringIO
+import os.path
 import re
-from bs4 import BeautifulSoup
 import struct
 import xmlrpc.client as xmlrpclib
 #SubSeek Script Created by Robins Gupta
 import hashlib
 import os
 import os.path
-import gzip
-import zlib
+
 
 
 
@@ -25,12 +20,12 @@ class OpenSubtitle:
             #Login
             self._login(user,pass_)
             self.path=path
-            print('Login Successfull...')
+            print('Login Successfull to openSubtitle...')
             #gathering movie data..
             #Checking Movie By hash
-            data = hashFile(self.path)
-            self.FileSize = data[1]
-            self.movie_hash = data[0]
+            self.data = hashFile(self.path)
+            self.FileSize = self.data[1]
+            self.movie_hash = self.data[0]
             #Checking the Movie file information
             self.movie_info = self.check_movie_hash(self.movie_hash)
             
@@ -39,6 +34,17 @@ class OpenSubtitle:
             resp = self.proxy.LogIn(username, password, 'en', 'OS Test User Agent')
             self.check_status(resp)
             self.token = resp['token']
+
+      def search_imdb(self,name):
+            #Modify name using regex
+            #Converting '-' and '.' in space chr
+            name = re.sub(r'(\-|\.)',' ',name)
+            resp = self.proxy.SearchMoviesOnIMDB(self.token,name)
+            print('IMDB SEARCH...')
+            if self.check_status(resp):
+                  'return the most expected movie id and the newly formed query in tuple'
+                  return (resp['data'][0],name)
+             
             
       def SearchSubtitles(self):
             'Method for searching subtitles'
@@ -53,9 +59,20 @@ class OpenSubtitle:
                         req = [ {'sublanguageid': sublanguageid, 'moviehash': str(self.movie_hash), 'moviebytesize': str(self.FileSize), \
                                  'imdbid': self.MovieImdbID,'query': str(query), 'season':self.SeriesSeason, 'episode':self.SeriesEpisode, 'tag':'0' } ]
                   else:
-                        req = [ {'sublanguageid':'eng','query': str(query)} ]
-                        
+                        #Check for imdb availaible info...
+                        file_info = self.search_imdb(query)
+                        query = file_info[1]
+                        self.MovieImdbID = file_info[0]['id']
+                        req = [ {'sublanguageid':sublanguageid, 'moviebytesize': str(self.FileSize), 'imdbid': self.MovieImdbID, 'query': str(query)} ]
+                          
                   resp = self.proxy.SearchSubtitles(self.token,req)
+                  
+                  #Checking for response
+                  if self.check_status(resp):
+                        return resp['data']
+                  else:
+                        return False
+                        
             else:
                   print("Path not defined")
  
@@ -68,10 +85,13 @@ class OpenSubtitle:
                   return False
             else:
                   return True
+      def logout(self):
+            self.proxy.LogOut(self.token)
 
       def check_movie_hash(self,moviehash):
             response = self.proxy.CheckMovieHash(self.token,[moviehash])
             if self.check_status(response):
+                  
                   #Return the data...
                   data=response['data'][moviehash]
                   if data:
@@ -87,9 +107,7 @@ class OpenSubtitle:
                         return movie_info
                         
                   else:
-                        #Ignore these
                         return ()
-                        
                   
                         
             else:
@@ -138,28 +156,6 @@ def hashFile(name):
     
       except(IOError): 
                 return "IOError"
-def get_md5_hash(name):
-      read_size = 64 * 1024
-      with open(name, 'rb') as f:
-            size = os.path.getsize(name)
-            #Reading first 64 kb of file
-            data = f.read(read_size)
-            #Now seeking to 64*1024 from last
-            f.seek(-read_size, os.SEEK_END)
-            #Now reading last 64 kb of file
-            data += f.read(read_size)
-      #Returning the md5 generated hash function of video file
-      return hashlib.md5(data).hexdigest()
-
-
-
-
-
-
-
-
-
-
 
 
 

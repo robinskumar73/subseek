@@ -43,8 +43,18 @@ class OpenSubtitle:
             print('IMDB SEARCH...')
             if self.check_status(resp):
                   'return the most expected movie id and the newly formed query in tuple'
-                  return (resp['data'][0],name)
-             
+                  for data in resp['data']:
+                        match_result = re.match( r'([A-Za-z0-9()\[\]]*)[\s|\.|\-|=]*([A-Za-z0-9()\[\]]*)?[\s|\.|\-|=]*([A-Za-z0-9()\[\]]*)?[\s|\.|\-|=]*', data['title'])
+                        #Checking for match query..
+                        print(match_result.group(1).lower())
+                        if (not name.lower().find(match_result.group(1).lower()) == -1 and \
+                            ( not name.lower().find(match_result.group(2).lower()) == -1 or not name.lower().find(match_result.group(3).lower()) == -1 )):
+                              #Matching occurs return data
+                              print ('\nMatched data')
+                              print(data)
+                              return (data,name)
+                        else:
+                              continue
             
       def SearchSubtitles(self):
             'Method for searching subtitles'
@@ -53,25 +63,55 @@ class OpenSubtitle:
             if self.path:
                   
                   query = os.path.basename( file_path(self.path) )
-
                   #Creating a request ...
-                  if self.movie_info:
-                        req = [ {'sublanguageid': sublanguageid, 'moviehash': str(self.movie_hash), 'moviebytesize': str(self.FileSize), \
-                                 'imdbid': self.MovieImdbID,'query': str(query), 'season':self.SeriesSeason, 'episode':self.SeriesEpisode, 'tag':'0' } ]
-                  else:
-                        #Check for imdb availaible info...
+                  #Preparing request
+                  request_query = {'sublanguageid': sublanguageid, 'moviebytesize': str(self.FileSize),'tag':'0'}
+                  if self.MovieHash:
+                        #Adding hash to request_query
+                        request_query['moviehash']=self.MovieHash
+                        #Adding query
+                        request_query['query'] = str(query)
+                        print('printing movie hash')
+                        
+                  if not self.MovieImdbID:
+                        print('searching for imdb id')
                         file_info = self.search_imdb(query)
                         query = file_info[1]
                         self.MovieImdbID = file_info[0]['id']
-                        req = [ {'sublanguageid':sublanguageid, 'moviebytesize': str(self.FileSize), 'imdbid': self.MovieImdbID, 'query': str(query)} ]
-                          
-                  resp = self.proxy.SearchSubtitles(self.token,req)
+                        #Now adding imdb id..
+                        request_query['imdbid'] = self.MovieImdbID
+                        #Adding query
+                        request_query['query'] = str(query)
+                  else:
+                        #Now adding imdb id..
+                        request_query['imdbid'] = self.MovieImdbID
+                        
+                  if self.SeriesSeason and not self.SeriesSeason == '0':
+                        request_query['season'] = self.SeriesSeason
+                        request_query['episode'] = self.SeriesEpisode
+                        
+                  request = []
+                  #appending query to request list
+                  request.append(request_query)
+                  print('\nrequest is: \n')
+                  print(request)        
+                  resp = self.proxy.SearchSubtitles(self.token,request)
+                  print('\nresponse is: \n')
                   
                   #Checking for response
-                  if self.check_status(resp):
+                  if self.check_status(resp) and resp['data']:
                         return resp['data']
                   else:
-                        return False
+                        #Search without using movie hash..
+                        del request_query['moviehash']
+                        print(request_query)
+                        #Now search Once More
+                        resp = self.proxy.SearchSubtitles(self.token,request)
+                        print(resp['data'][0])
+                        if self.check_status(resp):
+                              return resp['data']
+                        else:
+                              return False
                         
             else:
                   print("Path not defined")
@@ -92,28 +132,48 @@ class OpenSubtitle:
             response = self.proxy.CheckMovieHash(self.token,[moviehash])
             if self.check_status(response):
                   
-                  #Return the data...
-                  data=response['data'][moviehash]
-                  if data:
+                  
+                  if response['data'] and response['data'][moviehash]:
+                        #Return the data...
+                        data=response['data'][moviehash]
                         self.MovieYear = data['MovieYear']
                         self.SeriesEpisode = data['SeriesEpisode']
                         self.SeriesSeason = data['SeriesSeason']
                         self.MovieHash = data['MovieHash']
                         self.MovieName = data['MovieName']
                         self.MovieKind = data['MovieKind']
-                        self.MovieImdbID = data['MovieImdbID']
-                        #return data
-                        movie_info = (self.MovieYear, self.SeriesEpisode, self.SeriesSeason, self.MovieHash, self.MovieName, self.MovieKind, self.MovieImdbID)
-                        return movie_info
+                        self.MovieImdbID = data['MovieImdbID']            
                         
                   else:
-                        return ()
+                        self.MovieYear = ""
+                        self.SeriesEpisode = ""
+                        self.SeriesSeason = ""
+                        self.MovieHash = ""
+                        self.MovieName = ""
+                        self.MovieKind = ""
+                        self.MovieImdbID = ""
+
+                  #return data
+                  movie_info = (self.MovieYear, self.SeriesEpisode, self.SeriesSeason, self.MovieHash, self.MovieName, self.MovieKind, self.MovieImdbID)
+                  return movie_info
                   
                         
             else:
                   raise Exception('Error response from server response code: ' + response['status'].upper())
             
-            
+#Creating exception class...
+class MyException(Exception):
+      def imdbIdError(self):
+            pass
+      
+      def seriesIdError(self):
+            pass
+      
+      def episodeIdError(self):
+            pass
+      
+      def MovieHashError(self):
+            pass
 
 #creating a function for creating the subtitle name
 def file_path(path):

@@ -33,6 +33,7 @@ if __name__ == "__main__":
         conn = opensubtitle.OpenSubtitle(url_path,'robinskumar73','subseek2014')
         #Search for subtitle in opensubtitle.org
         results = conn.SearchSubtitles()
+        
         if results:
             #Download subtitle
             #Now checking for data in result...
@@ -106,7 +107,7 @@ if __name__ == "__main__":
             conn.logout()
             raise Exception('Subtitle not found in opensubtitle database')
 
-    except:
+    except TypeError:
         #Try Connecting to SubDb....
         print('connecting to subdb server')
         subdb.SubDb().conn(url_path)

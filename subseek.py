@@ -1,3 +1,8 @@
+
+'''
+Licence
+subSeek 1.0 - Utility software for Microsoft Windows OS designed to be download movies subtitles  files. Copyright (C) 2012 Robins Kumar Gupta This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, if not, write to the Robins Kumar Gupta Email-robinskumar73@gmail.com For More Info Visit : https://bitbucket.org/robinskumar73/seeksub
+'''
 #SubSeek Script Created by Robins Gupta
 import hashlib
 import os
@@ -34,9 +39,9 @@ class CreateConn():
         #reading data from created socket if data is compressed
         if self.sock_obj.headers['Content-Encoding'] == 'gzip':
             if  buffer:
-                data = gzip.GzipFile(fileobj=StringIO.StringIO(self.sock_obj.read()).read())
+                data = gzip.GzipFile(fileobj=StringIO(self.sock_obj.read()).read())
             else :
-                data = gzip.GzipFile(fileobj=StringIO.StringIO(self.sock_obj.read()).read(buffer))                
+                data = gzip.GzipFile(fileobj=StringIO(self.sock_obj.read()).read(buffer))                
         else:
             if buffer:
                 data = self.sock_obj.read(buffer)

@@ -13,7 +13,7 @@ Installation is user friendly...
 How To install Manual
 ======================
 
-->Download and Install the recent version of SubSeek installer file.       https://github.com/robinskumar73/subseek/releases/download/v1.2/setup.exe
+->Download and Install the recent version of SubSeek installer file.     <br/>  https://github.com/robinskumar73/subseek/releases/download/v1.2/setup.exe
   
 ->After installation right click on any movie file of which you want to download its subtitle..
 
@@ -25,9 +25,9 @@ How To install Manual
 =====================================
 Licence GNU2.0
 
-Current Subtitle download server database
-http://www.opensubtitles.org
-http://thesubdb.com
+Current Subtitle download server database<br />
+http://www.opensubtitles.org<br />
+http://thesubdb.com<br />
 http://subscene.com
 
 Advanced Movie search from IMDB

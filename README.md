@@ -13,15 +13,14 @@ Installation is user friendly...
 How To install Manual
 ======================
 
-->**Download and Install the recent version of SubSeek installer file.
-  https://github.com/robinskumar73/subseek/releases/download/v1.2/setup.exe
-  =========================================================================
-->**After installation right click on any movie file of which you want to download its subtitle..
+->Download and Install the recent version of SubSeek installer file.       https://github.com/robinskumar73/subseek/releases/download/v1.2/setup.exe
+  
+->After installation right click on any movie file of which you want to download its subtitle..
 
-->**In right click option menu
+->In right click option menu
             --click on "Download Subtitle" option and Voila!!
 
-->**Your Favourate movie subtitle is downloaded...
+->Your Favourate movie subtitle is downloaded...
 
 =====================================
 Licence GNU2.0

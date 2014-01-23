@@ -24,6 +24,8 @@ def write(path,data):
 #Now loading the file..
 if __name__ == "__main__":
     url_path=sys.argv[1]
+    #f_err = open("err_log.log", "w")
+    #sys.stdout = f_err
     #Subtitle file name
     sub_file_name = subdb.sub_file(url_path)
     
@@ -107,8 +109,10 @@ if __name__ == "__main__":
             conn.logout()
             raise Exception('Subtitle not found in opensubtitle database')
 
-    except TypeError:
+    except:
         #Try Connecting to SubDb....
         print('connecting to subdb server')
         subdb.SubDb().conn(url_path)
+    #Closing std-err file..
+    #f_err.close()
     

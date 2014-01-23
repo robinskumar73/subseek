@@ -46,12 +46,10 @@ class OpenSubtitle:
                   for data in resp['data']:
                         match_result = re.match( r'([A-Za-z0-9()\[\]]*)[\s|\.|\-|=]*([A-Za-z0-9()\[\]]*)?[\s|\.|\-|=]*([A-Za-z0-9()\[\]]*)?[\s|\.|\-|=]*', data['title'])
                         #Checking for match query..
-                        print(match_result.group(1).lower())
+         
                         if (not name.lower().find(match_result.group(1).lower()) == -1 and \
                             ( not name.lower().find(match_result.group(2).lower()) == -1 or not name.lower().find(match_result.group(3).lower()) == -1 )):
                               #Matching occurs return data
-                              print ('\nMatched data')
-                              print(data)
                               return (data,name)
                         else:
                               continue
@@ -93,10 +91,10 @@ class OpenSubtitle:
                   request = []
                   #appending query to request list
                   request.append(request_query)
-                  print('\nrequest is: \n')
-                  print(request)        
+                  
+                    
                   resp = self.proxy.SearchSubtitles(self.token,request)
-                  print('\nresponse is: \n')
+                 
                   
                   #Checking for response
                   if self.check_status(resp) and resp['data']:
@@ -104,10 +102,10 @@ class OpenSubtitle:
                   else:
                         #Search without using movie hash..
                         del request_query['moviehash']
-                        print(request_query)
+                        
                         #Now search Once More
                         resp = self.proxy.SearchSubtitles(self.token,request)
-                        print(resp['data'][0])
+                        
                         if self.check_status(resp):
                               return resp['data']
                         else:
@@ -121,7 +119,7 @@ class OpenSubtitle:
       #Exception handling part
       def check_status(self,response):
             if response['status'].upper() != '200 OK' :
-                  print(response['status'].upper())
+                  
                   return False
             else:
                   return True

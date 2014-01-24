@@ -1,4 +1,4 @@
-SubSeek (Subtitle Seeker)
+SubSeek (Subtitle Downloader)
 =======
 
 Download your movie subtitles in one click

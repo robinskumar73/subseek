@@ -6,6 +6,8 @@ import urllib.request as urllib2
 from io import BytesIO
 import re
 import zipfile
+import socket
+from messagebox import messagebox as display
 
 
 print('\n\n\n')
@@ -23,7 +25,10 @@ def write(path,data):
 
 #Now loading the file..
 if __name__ == "__main__":
+    #Commenting temporarilly
     url_path=sys.argv[1]
+    #url_path = "E:\\No Smoking 2007.avi"
+    
     #f_err = open("err_log.log", "w")
     #sys.stdout = f_err
     #Subtitle file name
@@ -32,6 +37,7 @@ if __name__ == "__main__":
     #First try subtitle from opensubtitle....
     print('Connecting to openSubtitle...')
     try:
+        print("I am here in main file")
         conn = opensubtitle.OpenSubtitle(url_path,'robinskumar73','subseek2014')
         #Search for subtitle in opensubtitle.org
         results = conn.SearchSubtitles()
@@ -52,6 +58,7 @@ if __name__ == "__main__":
                         #Now writing subtitle to file...
                         write(sub_file_name, data)
                         print ('subtitle downloaded successfully...Enjoy!!')
+                        
                         break
                        
                     
@@ -80,8 +87,8 @@ if __name__ == "__main__":
                                     sub_file.append(file)
 
                             #Writing zip file
-                            if subfile and len(subfile)==1:
-                                data = z.read(subfile[0])
+                            if sub_file and len(sub_file)==1:
+                                data = z.read(sub_file[0])
                                 #Now writing subtitle to file...
                                 sub_data = write(sub_file_name, data)
                                 
@@ -109,10 +116,19 @@ if __name__ == "__main__":
             conn.logout()
             raise Exception('Subtitle not found in opensubtitle database')
 
+    except socket.gaierror:
+            display("Unable to connect to the internet", "Check your internet connection.")
+
     except:
         #Try Connecting to SubDb....
         print('connecting to subdb server')
-        subdb.SubDb().conn(url_path)
+        try:
+            subdb.SubDb().conn(url_path)
+        except FileNotFoundError:
+            display("Sorry, File not found", "Subtitle not found.")
+            
+      
+        
     #Closing std-err file..
     #f_err.close()
     

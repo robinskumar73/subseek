@@ -13,7 +13,7 @@ import os.path
 class OpenSubtitle:
       'Class for searching and downloading subtitle from OpenSubtitle'
 
-      def __init__(self,path,user,pass_):
+      def __init__(self, path, user, pass_, getImdbInfo = False):
             'Contructor for opensubtitle'
             'Connecting to server'
             self.proxy = xmlrpclib.ServerProxy('http://api.opensubtitles.org/xml-rpc')
@@ -28,6 +28,7 @@ class OpenSubtitle:
             self.movie_hash = self.data[0]
             #Checking the Movie file information
             self.movie_info = self.check_movie_hash(self.movie_hash)
+            self.getImdbInfo = getImdbInfo
             
             
       def _login(self,username,password):
@@ -87,6 +88,17 @@ class OpenSubtitle:
                   if self.SeriesSeason and not self.SeriesSeason == '0':
                         request_query['season'] = self.SeriesSeason
                         request_query['episode'] = self.SeriesEpisode
+
+                  #IF getImdbInfo is true then just find the info and return...      
+                  if self.getImdbInfo:
+                        print('getting imdb info..')
+                        if request_query['imdbid']:
+                              resp = self.getIMDBInfo(request_query['imdbid'])
+                              
+                              return resp['data']
+                        else:
+                              #Else just return blank
+                              return ''
                         
                   request = []
                   #appending query to request list
@@ -114,7 +126,12 @@ class OpenSubtitle:
             else:
                   print("Path not defined")
  
-                  
+      def getIMDBInfo(self,imdbId):
+            #Now search for imdb info..
+            print("Inside getIMDBInfo method")
+            resp = self.proxy.GetIMDBMovieDetails(self.token,imdbId)
+            return resp
+            
       
       #Exception handling part
       def check_status(self,response):

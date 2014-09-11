@@ -14,7 +14,6 @@ from messagebox import messagebox as display
 if __name__ == "__main__":
     #Commenting temporarilly
     url_path=sys.argv[1]
-    #url_path = "E:\\No Smoking 2007.avi"
     #f_err = open("err_log.log", "w")
     #sys.stdout = f_err
     #Subtitle file name

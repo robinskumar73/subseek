@@ -5,7 +5,11 @@ import xmlrpc.client as xmlrpclib
 #SubSeek Script Created by Robins Gupta
 import hashlib
 import os
+
 import os.path
+
+
+
 
 
 
@@ -13,7 +17,7 @@ import os.path
 class OpenSubtitle:
       'Class for searching and downloading subtitle from OpenSubtitle'
 
-      def __init__(self, path, user, pass_, getImdbInfo = False):
+      def __init__(self, path, user, pass_, getImdbInfo = False,language = 'eng'):
             'Contructor for opensubtitle'
             'Connecting to server'
             self.proxy = xmlrpclib.ServerProxy('http://api.opensubtitles.org/xml-rpc')
@@ -29,6 +33,7 @@ class OpenSubtitle:
             #Checking the Movie file information
             self.movie_info = self.check_movie_hash(self.movie_hash)
             self.getImdbInfo = getImdbInfo
+            self.language = language
             
             
       def _login(self,username,password):
@@ -57,7 +62,7 @@ class OpenSubtitle:
             
       def SearchSubtitles(self):
             'Method for searching subtitles'
-            sublanguageid = 'eng'
+            sublanguageid = self.language
             'Getting MovieHash...'
             if self.path:
                   
@@ -106,6 +111,7 @@ class OpenSubtitle:
                   
                     
                   resp = self.proxy.SearchSubtitles(self.token,request)
+                  print (resp)
                  
                   
                   #Checking for response

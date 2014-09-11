@@ -64,14 +64,14 @@ class SubDb():
         return hashlib.md5(data).hexdigest()
 
     #Now creating a connection with site
-    def conn(self,path):
+    def conn(self,path,lang='en'):
         #we are using a default user-agent provided 
         user_agent = 'SubDB/1.0 (Pyrrot/0.1; http://github.com/jrhames/pyrrot-cli)'
         #creating connecting using GET method
         #getting hash of video file
         hash = self.get_md5_hash(path)
         #creating url of the file
-        url = 'http://api.thesubdb.com/?action=download&hash=%s&language=en'%(hash)
+        url = 'http://api.thesubdb.com/?action=download&hash=%s&language='%(hash, lang)
         #conn
         try:
             conn = CreateConn(url,header=user_agent)

@@ -8,11 +8,18 @@ import re
 import zipfile
 import socket
 from messagebox import messagebox as display
-
+from bs4 import *
+import os
 
 print('\n\n\n')
 print('*'*20 + 'Subtitle Downloaded By Robins Gupta' + '*'*20)
 print('\n\n\n')
+
+
+#----DEFINING SOME GLOBAL VALUES UPDATE WHEN GENERATING ITS SETUP EVERTIME----
+def AppID():
+    #Unique appId for subseek in registry
+    return '79BD0AB7-300D-4434-AB0A-04BFD868DB4B'
 
 
 
@@ -21,13 +28,36 @@ def write(path,data):
     with open(path,'wb') as f:
         f.write(data)
 
-
+def getLanguage():
+    #getting file location..
+    dir = os.getcwd()
+    file = os.path.join(dir, "configuration.xml")
+    #file = "E:\\subseek_new\configuration.xml"
+    handler = open(file).read()
+    soup = BeautifulSoup(handler)
+    try:
+        m = re.search('[a-zA-Z0-9]+', soup.subtitlelanguage.contents[0])
+        return m.group(0)
+    except:
+        return 'eng'
+    
+def getUrlData(url, decodeUTF_8 = False):
+    request = urllib2.Request(url)
+    request.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110201')
+    sock_obj = urllib2.urlopen(request)
+    if decodeUTF_8:    
+        data = sock_obj.read()
+        data = data.decode("utf-8")
+    else:
+        data = sock_obj.read()
+    return data
 
 #Now loading the file..
 if __name__ == "__main__":
+   
     #Commenting temporarilly
-    url_path=sys.argv[1]
-    #url_path = "E:\\No Smoking 2007.avi"
+    #url_path=sys.argv[1]
+    url_path = "D:\\Oculus.2013.720p.BluRay.x264.YIFY.mp4"
     
     #f_err = open("err_log.log", "w")
     #sys.stdout = f_err
@@ -38,7 +68,7 @@ if __name__ == "__main__":
     print('Connecting to openSubtitle...')
     try:
         print("I am here in main file")
-        conn = opensubtitle.OpenSubtitle(url_path,'robinskumar73','subseek2014')
+        conn = opensubtitle.OpenSubtitle(url_path,'robinskumar73','subseek2014',False,getLanguage())
         #Search for subtitle in opensubtitle.org
         results = conn.SearchSubtitles()
         
@@ -49,10 +79,7 @@ if __name__ == "__main__":
                 try:
                     download_link = data['SubDownloadLink']
                     if download_link:
-                        request = urllib2.Request(download_link)
-                        request.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110201')
-                        sock_obj = urllib2.urlopen(request)
-                        f=BytesIO(sock_obj.read())
+                        f=BytesIO(getUrlData(download_link))
                         data = gzip.open(f).read()
                         
                         #Now writing subtitle to file...
@@ -123,12 +150,25 @@ if __name__ == "__main__":
         #Try Connecting to SubDb....
         print('connecting to subdb server')
         try:
-            subdb.SubDb().conn(url_path)
+            lang = getLanguage()
+            lang = lang[0] + lang[1]
+            subdb.SubDb().conn(url_path, lang)
         except FileNotFoundError:
             display("Sorry, File not found", "Subtitle not found.")
-            
-      
+
+
+
+    #---------------------------------------------SCRIPT FOR CHECKING OF UPDATES---------------------------------
+    '''NOW CHECKING FOR UPDATES IF AVAILAIBLE...'''
+    #Get current version value from the server..
+    VersionLink = "http://subseek.in/version.txt"
+    data = getUrlData(VersionLink, True)
+    #formatting the data to get the exact version info.  
+    Version = re.sub(r"[a-z]*", '', data.decode("utf-8"), flags=re.IGNORECASE)
+    Version = float(Version)
+
+    #Now checking this value from our window registry installed version..
+    
         
-    #Closing std-err file..
-    #f_err.close()
+ 
     

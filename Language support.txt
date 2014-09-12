@@ -1,0 +1,44 @@
+ara	ar	Arabic	
+asm	as	Assamese	
+ben	bn	Bengali
+chi	zh	Chinese	
+cze	cs	Czech	
+dan	da	Danish	
+eng	en	English	
+fre	fr	French	
+ger	de	German	
+guj	gu	Gujarati
+hin	hi	Hindi
+ind	id	Indonesian
+ita	it	Italian
+
+jpn	ja	Japanese
+
+kan	kn	Kannada	
+
+kas	ks	Kashmiri	
+
+kor	ko	Korean	
+
+
+mar	mr	Marathi	
+
+mni	ma	Manipuri
+
+nep	ne	Nepali	
+
+
+
+por	pt	Portuguese	
+	
+raj		Rajasthani	
+
+rus	ru	Russian	
+
+spa	es	Spanish	
+
+tel	te	Telugu	
+
+
+rum	ro	Romanian	
+pob	pb	Brazilian

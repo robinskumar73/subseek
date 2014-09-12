@@ -69,20 +69,137 @@ begin
   case ComboBox.ItemIndex of
     0:
     begin
-      FileWrite('eng');
+      FileWrite('ara');
     end;
     1:
     begin
-     FileWrite('spa');
+     FileWrite('asm');
     end;
     2:
     begin
-      FileWrite('hin');
+      FileWrite('ben');
     end;
     3:
     begin
+      FileWrite('chi');
+    end;
+
+    4:
+    begin
+      FileWrite('cze');
+    end;
+
+    5:
+    begin
+      FileWrite('dan');
+    end;
+
+    6:
+    begin
+      FileWrite('eng');
+    end;
+
+    7:
+    begin
+      FileWrite('fre');
+    end;
+
+    8:
+    begin
+      FileWrite('ger');
+    end;
+
+    9:
+    begin
+      FileWrite('guj');
+    end;
+
+    10:
+    begin
+      FileWrite('hin');
+    end;
+
+    11:
+    begin
+      FileWrite('ind');
+    end;
+
+    12:
+    begin
       FileWrite('ita');
     end;
+
+    13:
+    begin
+      FileWrite('jpn');
+    end;
+
+
+    14:
+    begin
+      FileWrite('kan');
+    end;
+
+    15:
+    begin
+     FileWrite('kas');
+    end;
+
+    16:
+    begin
+      FileWrite('kor');
+    end;
+    17:
+    begin
+      FileWrite('mar');
+    end;
+
+    18:
+    begin
+      FileWrite('mni');
+    end;
+
+    19:
+    begin
+      FileWrite('nep');
+    end;
+
+    20:
+    begin
+      FileWrite('por');
+    end;
+
+    21:
+    begin
+      FileWrite('raj');
+    end;
+
+    22:
+    begin
+      FileWrite('rus');
+    end;
+
+    23:
+    begin
+      FileWrite('spa');
+    end;
+
+    24:
+    begin
+      FileWrite('tel');
+    end;
+
+
+    25:
+    begin
+      FileWrite('rum');
+    end;
+
+    26:
+    begin
+      FileWrite('pob');
+    end;
+
   end;
 end;
 
@@ -107,13 +224,36 @@ begin
   ComboBox.Parent := CustomPage.Surface;
   ComboBox.Left := 0;
   ComboBox.Top := DescLabel.Top + DescLabel.Height + 6;  
-  ComboBox.Width := 160;
+  ComboBox.Width := 190;
   ComboBox.Style := csDropDownList;
-  ComboBox.Items.Add('English');
-  ComboBox.Items.Add('Spanish');
-  ComboBox.Items.Add('Hindi');
-  ComboBox.Items.Add('Italian');
   ComboBox.Items.Add('Arabic');
+  ComboBox.Items.Add('Assamese');
+  ComboBox.Items.Add('Bengali');
+  ComboBox.Items.Add('Chinese	');
+  ComboBox.Items.Add('Czech	');
+  ComboBox.Items.Add('Danish	');
+  ComboBox.Items.Add('English	');
+  ComboBox.Items.Add('French	');
+  ComboBox.Items.Add('German	');
+  ComboBox.Items.Add('Gujarati	');
+  ComboBox.Items.Add('Hindi	');
+  ComboBox.Items.Add('Indonesian	');
+  ComboBox.Items.Add('Italian	');
+  ComboBox.Items.Add('Japanese	');
+  ComboBox.Items.Add('Kannada		');
+  ComboBox.Items.Add('Kashmiri');
+  ComboBox.Items.Add('Korean		');
+  ComboBox.Items.Add('Marathi		');
+  ComboBox.Items.Add('Manipuri	');
+  ComboBox.Items.Add('Nepali');
+  ComboBox.Items.Add('Portuguese');
+  ComboBox.Items.Add('Rajasthani');
+  ComboBox.Items.Add('Russian');
+  ComboBox.Items.Add('Spanish	');
+  ComboBox.Items.Add('Telugu	');
+  ComboBox.Items.Add('Romanian	');
+  ComboBox.Items.Add('Brazilian');
+
   ComboBox.OnChange := @ComboBoxChange;
   
 end;

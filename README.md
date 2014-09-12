@@ -25,6 +25,25 @@ How To install Manual
 =====================================
 Licence GNU2.0
 
+
+Download your movie subtitles in one click.
+===========================================
+
+Version 1.4 Feature added
+1)Multiple language support.
+2)Multiple language subtitle download in upto 26 different language added.
+3)Automatic update check and installation of newer version feature added.
+4)Several bugs fixed.
+5)IMDB Movie info grabber feature added and several bugs fixed.
+6)Automatic uninstall of previous version while installing a newer added.
+
+
+
+
+
+
+Licence GNU2.0
+
 Current Subtitle download server database<br />
 http://www.opensubtitles.org<br />
 http://thesubdb.com<br />

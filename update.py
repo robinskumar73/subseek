@@ -20,7 +20,7 @@ import sys
 
 
 
-url = 'https://github.com/robinskumar73/subseek/releases/download/v1.3/setup.exe'
+url = 'https://github.com/robinskumar73/subseek/releases/download/v1.3/Subseek.exe'
 
 class MyTkApp(threading.Thread):
     

@@ -10,6 +10,16 @@ import socket
 from messagebox import messagebox as display
 from bs4 import *
 import os
+from updateDialog import *
+#Python code for reading registry information...
+from winreg import ConnectRegistry, OpenKey, QueryValueEx, HKEY_LOCAL_MACHINE
+from multiprocessing import freeze_support
+
+    
+
+
+
+
 
 print('\n\n\n')
 print('*'*20 + 'Subtitle Downloaded By Robins Gupta' + '*'*20)
@@ -17,9 +27,9 @@ print('\n\n\n')
 
 
 #----DEFINING SOME GLOBAL VALUES UPDATE WHEN GENERATING ITS SETUP EVERTIME----
-def AppID():
+def GetAppID():
     #Unique appId for subseek in registry
-    return '79BD0AB7-300D-4434-AB0A-04BFD868DB4B'
+    return '{79BD0AB7-300D-4434-AB0A-04BFD868DB4B}_is1'
 
 
 
@@ -30,8 +40,8 @@ def write(path,data):
 
 def getLanguage():
     #getting file location..
-    dir = os.getcwd()
-    file = os.path.join(dir, "configuration.xml")
+    dir_ = getInstalledPath(GetAppID())
+    file = os.path.join(dir_, "configuration.xml")
     #file = "E:\\subseek_new\configuration.xml"
     handler = open(file).read()
     soup = BeautifulSoup(handler)
@@ -40,6 +50,20 @@ def getLanguage():
         return m.group(0)
     except:
         return 'eng'
+
+
+def getCheckUpdatePermission():
+    #getting file location..
+    dir_ = getInstalledPath(GetAppID())
+    file = os.path.join(dir_, "configuration.xml")
+    #file = "E:\\subseek_new\configuration.xml"
+    handler = open(file).read()
+    soup = BeautifulSoup(handler)
+    try:
+        m = re.search('[0-9]+', soup.updatecheck.contents[0])
+        return m.group(0)
+    except:
+        return 1
     
 def getUrlData(url, decodeUTF_8 = False):
     request = urllib2.Request(url)
@@ -52,12 +76,40 @@ def getUrlData(url, decodeUTF_8 = False):
         data = sock_obj.read()
     return data
 
+
+def GetSubseekRegistryVersion(AppID):
+    #returns the installed subseek version info..
+    """ Reading from SOFTWARE\Microsoft\Windows\CurrentVersion\Run  """
+    aReg = ConnectRegistry(None,HKEY_LOCAL_MACHINE)
+    path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+    abs_path = os.path.join(path, AppID)
+    aKey = OpenKey(aReg, abs_path)
+    val = QueryValueEx(aKey, "DisplayVersion")
+    val = float(val[0])
+    return val
+
+
+def getInstalledPath(AppID):
+    #returns the installed subseek version info..
+    """ Reading from SOFTWARE\Microsoft\Windows\CurrentVersion\Run  """
+    aReg = ConnectRegistry(None,HKEY_LOCAL_MACHINE)
+    path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+    abs_path = os.path.join(path, AppID)
+    aKey = OpenKey(aReg, abs_path)
+    val = QueryValueEx(aKey, "InstallLocation")
+    val = val[0]
+    return val
+    
+
 #Now loading the file..
 if __name__ == "__main__":
-   
+    try:
+        freeze_support()
+    except:
+        sys.exit()
     #Commenting temporarilly
-    #url_path=sys.argv[1]
-    url_path = "D:\\Oculus.2013.720p.BluRay.x264.YIFY.mp4"
+    url_path=sys.argv[1]
+    #url_path = "D:\\Oculus.2013.720p.BluRay.x264.YIFY.mp4"
     
     #f_err = open("err_log.log", "w")
     #sys.stdout = f_err
@@ -134,10 +186,7 @@ if __name__ == "__main__":
             #Now closing session from opensubtitles
             'Logging out from opensubtitle server'
             conn.logout()
-                    
-                
-                    
-
+            
         else:
             #Now closing session from opensubtitles
             conn.logout()
@@ -160,15 +209,29 @@ if __name__ == "__main__":
 
     #---------------------------------------------SCRIPT FOR CHECKING OF UPDATES---------------------------------
     '''NOW CHECKING FOR UPDATES IF AVAILAIBLE...'''
-    #Get current version value from the server..
-    VersionLink = "http://subseek.in/version.txt"
-    data = getUrlData(VersionLink, True)
-    #formatting the data to get the exact version info.  
-    Version = re.sub(r"[a-z]*", '', data.decode("utf-8"), flags=re.IGNORECASE)
-    Version = float(Version)
-
-    #Now checking this value from our window registry installed version..
-    
+    #checking first if  update is permissible or not...
+    if getCheckUpdatePermission() == '1':
+        print("I am checking for permission....")
+        #Get current version value from the server..
+        VersionLink = "http://subseek.in/version.txt"
+        data = getUrlData(VersionLink, True)
+        #formatting the data to get the exact version info.  
+        Version = re.sub(r"[a-z]*", '', data, flags=re.IGNORECASE)
+        Version = float(Version)
+        #Now checking this value from our window registry installed version..
+        appId = GetAppID()
+        #Now getting the installed version info of registry...
+        InstalledVersion = GetSubseekRegistryVersion(appId)
+     
+        if Version > InstalledVersion:
+            #An update is found...
+            '''Display a message box showing an update is found..'''
+            title = "Update availaible for version " + str(Version)
+            message = "An update for subseek is availaible for version " + str(Version) + "."
+            #Creating a TEMP FOLDER..
+            #for creating a temporary folder
+            showUpdateDialogBox(title, message )
+            
+          
         
- 
     

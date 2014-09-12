@@ -71,7 +71,7 @@ class SubDb():
         #getting hash of video file
         hash = self.get_md5_hash(path)
         #creating url of the file
-        url = 'http://api.thesubdb.com/?action=download&hash=%s&language='%(hash, lang)
+        url = 'http://api.thesubdb.com/?action=download&hash=%s&language=%s'%(hash, lang)
         #conn
         try:
             conn = CreateConn(url,header=user_agent)

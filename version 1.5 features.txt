@@ -2,6 +2,7 @@ Download your movie subtitles in one click.
 
 version 1.5 Feature:-
 1)Bug fixed for UAC restricted writing of files at program folders.
+2)Configuration file moved to app data directory.
 
 Version 1.4 Feature added
 1)Multiple language support.

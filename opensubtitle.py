@@ -111,7 +111,7 @@ class OpenSubtitle:
                   
                     
                   resp = self.proxy.SearchSubtitles(self.token,request)
-                  print (resp)
+                 
                  
                   
                   #Checking for response

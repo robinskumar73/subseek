@@ -109,7 +109,7 @@ if __name__ == "__main__":
         sys.exit()
     #Commenting temporarilly
     url_path=sys.argv[1]
-    #url_path = "D:\\Oculus.2013.720p.BluRay.x264.YIFY.mp4"
+    
     
     #f_err = open("err_log.log", "w")
     #sys.stdout = f_err
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     #First try subtitle from opensubtitle....
     print('Connecting to openSubtitle...')
     try:
-        print("I am here in main file")
+     
         conn = opensubtitle.OpenSubtitle(url_path,'robinskumar73','subseek2014',False,getLanguage())
         #Search for subtitle in opensubtitle.org
         results = conn.SearchSubtitles()
@@ -194,6 +194,7 @@ if __name__ == "__main__":
 
     except socket.gaierror:
             display("Unable to connect to the internet", "Check your internet connection.")
+            sys.exit()
 
     except:
         #Try Connecting to SubDb....
@@ -204,9 +205,10 @@ if __name__ == "__main__":
             subdb.SubDb().conn(url_path, lang)
         except FileNotFoundError:
             display("Sorry, File not found", "Subtitle not found.")
-
-
-
+            sys.exit()
+        except:
+            display("Error could connect","Could create connection to the server. Check your internet connection.")
+            sys.exit()
     #---------------------------------------------SCRIPT FOR CHECKING OF UPDATES---------------------------------
     '''NOW CHECKING FOR UPDATES IF AVAILAIBLE...'''
     #checking first if  update is permissible or not...
@@ -214,7 +216,11 @@ if __name__ == "__main__":
         print("I am checking for permission....")
         #Get current version value from the server..
         VersionLink = "http://subseek.in/version.txt"
-        data = getUrlData(VersionLink, True)
+        try:
+            data = getUrlData(VersionLink, True)
+        except:
+            display("Unable to connect to the internet", "Check your internet connection.")
+            sys.exit()
         #formatting the data to get the exact version info.  
         Version = re.sub(r"[a-z]*", '', data, flags=re.IGNORECASE)
         Version = float(Version)

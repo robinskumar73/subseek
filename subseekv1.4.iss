@@ -159,8 +159,9 @@ procedure CurPageChanged(CurPageID: Integer);
 end;
 
 procedure FileWrite(lang: string);
-begin                              	
-  fileName := ExpandConstant('{pf}\{#MyAppName}\configuration.xml');
+begin    
+  ForceDirectories(ExpandConstant('{userappdata}\{#MyAppName}'))
+  fileName := ExpandConstant('{userappdata}\{#MyAppName}\configuration.xml');
   SetArrayLength(lines, 9);
   lines[0] := '<?xml version="1.0" encoding="utf-8"?>';
   lines[1] := '<subseeek>';

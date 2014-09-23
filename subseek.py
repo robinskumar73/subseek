@@ -21,9 +21,6 @@ from multiprocessing import freeze_support
 
 
 
-print('\n\n\n')
-print('*'*20 + 'Subtitle Downloaded By Robins Gupta' + '*'*20)
-print('\n\n\n')
 
 
 #----DEFINING SOME GLOBAL VALUES UPDATE WHEN GENERATING ITS SETUP EVERTIME----
@@ -40,10 +37,32 @@ def write(path,data):
 
 def getLanguage():
     #getting file location..
-    dir_ = getInstalledPath(GetAppID())
+    dir_ = getAppPath()
     file = os.path.join(dir_, "configuration.xml")
     #file = "E:\\subseek_new\configuration.xml"
-    handler = open(file).read()
+    try:
+        handler = open(file).read()
+    except FileNotFoundError:
+        #Create a dummy configuration file...
+        data = '''<?xml version="1.0" encoding="utf-8"?>
+<subseeek>
+ <subtitlelanguage>
+eng
+</subtitlelanguage> 
+<updateCheck>
+1
+</updateCheck>
+</subseeek>'''
+
+        try:
+            with open(file,'w') as f:
+                f.write(data)
+            handler = open(file).read()
+            
+        except:
+            #In this case fall back to english subtitles...
+            return 'eng'
+            
     soup = BeautifulSoup(handler)
     try:
         m = re.search('[a-zA-Z0-9]+', soup.subtitlelanguage.contents[0])
@@ -54,9 +73,9 @@ def getLanguage():
 
 def getCheckUpdatePermission():
     #getting file location..
-    dir_ = getInstalledPath(GetAppID())
+    dir_ = getAppPath()
     file = os.path.join(dir_, "configuration.xml")
-    #file = "E:\\subseek_new\configuration.xml"
+    
     handler = open(file).read()
     soup = BeautifulSoup(handler)
     try:
@@ -99,16 +118,32 @@ def getInstalledPath(AppID):
     val = QueryValueEx(aKey, "InstallLocation")
     val = val[0]
     return val
+
+def getAppPath():
+    path = os.getenv('APPDATA')
+    abs_path = os.path.join(path,"Subseek")
+    if(os.path.exists(abs_path)):
+        return abs_path
+    else:
+        os.makedirs(abs_path)
+    return abs_path
     
 
 #Now loading the file..
 if __name__ == "__main__":
+
+    print('\n\n\n')
+    print('*'*20 + 'Subtitle Downloaded By Robins Gupta' + '*'*20)
+    print('\n\n\n')
+
+    
     try:
         freeze_support()
     except:
         sys.exit()
     #Commenting temporarilly
     url_path=sys.argv[1]
+    #url_path="D:\\Kiss Kiss Bang Bang BRRrip 720p x264 Dual Audio[Eng-Hindi] -=rAhuLKO=-more on www.mastitorrents.com.mkv"
     
     
     #f_err = open("err_log.log", "w")
@@ -119,8 +154,9 @@ if __name__ == "__main__":
     #First try subtitle from opensubtitle....
     print('Connecting to openSubtitle...')
     try:
-     
+        
         conn = opensubtitle.OpenSubtitle(url_path,'robinskumar73','subseek2014',False,getLanguage())
+        print("Connection created to opensubtutle..") 
         #Search for subtitle in opensubtitle.org
         results = conn.SearchSubtitles()
         

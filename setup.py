@@ -13,7 +13,7 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 setup(  name = "subseek",
-        version = "1.4",
+        version = "1.5",
         description = "One Click Movie subtitle downloader and IMDB Info generator.",
         options = {"build_exe": build_exe_options},
         executables = [Executable("subseek.py", base=base),

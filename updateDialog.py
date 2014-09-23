@@ -55,7 +55,7 @@ class UpdateDialog:
         data = '''<?xml version="1.0" encoding="utf-8"?>\n<subseeek>\n '''
          
         #getting file location..
-        dir_ = getInstalledPath(GetAppID())
+        dir_ = getAppPath()
         file = os.path.join(dir_, "configuration.xml")
         f = open(file,'r')
         handler = f.read()
